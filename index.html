@@ -1,0 +1,2445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descomposición de Volumen MDLZ | Metodología de Análisis</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&family=Roboto+Slab:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* MDLZ Color Palette */
+            --mdlz-purple-dark: #4B286D;
+            --mdlz-purple: #6B3FA0;
+            --mdlz-purple-light: #9B7BB8;
+            --mdlz-purple-lighter: #D4C4E0;
+            --mdlz-orange: #F5A623;
+            --mdlz-orange-dark: #D4820C;
+            --mdlz-green: #2E8B57;
+            --mdlz-green-light: #3CB371;
+            --mdlz-red: #C0392B;
+            --mdlz-blue: #2980B9;
+            --mdlz-cyan: #17A2B8;
+            --mdlz-brown: #8B5A2B;
+            
+            /* Neutrals */
+            --gray-900: #1a1a1a;
+            --gray-800: #333333;
+            --gray-700: #4d4d4d;
+            --gray-600: #666666;
+            --gray-500: #808080;
+            --gray-400: #999999;
+            --gray-300: #b3b3b3;
+            --gray-200: #cccccc;
+            --gray-100: #e6e6e6;
+            --gray-50: #f5f5f5;
+            --white: #ffffff;
+            
+            /* Semantic */
+            --positive: #2E8B57;
+            --positive-bg: rgba(46, 139, 87, 0.1);
+            --negative: #C0392B;
+            --negative-bg: rgba(192, 57, 43, 0.1);
+            --neutral-highlight: #F5A623;
+            --neutral-bg: rgba(245, 166, 35, 0.1);
+            
+            /* Layout */
+            --border-color: #e0e0e0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--white);
+            color: var(--gray-800);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 0 2rem;
+            background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-logo {
+            width: 32px;
+            height: 32px;
+            background: var(--mdlz-purple);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        .nav-title {
+            font-family: 'Roboto Slab', serif;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--mdlz-purple-dark);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.25rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            background: var(--gray-50);
+            color: var(--mdlz-purple);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 6rem 2rem 4rem;
+            background: linear-gradient(135deg, var(--mdlz-purple-dark) 0%, var(--mdlz-purple) 100%);
+            position: relative;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: linear-gradient(180deg, transparent 0%, var(--white) 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            padding: 0.375rem 1rem;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--white);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-family: 'Roboto Slab', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--white);
+            margin-bottom: 1.25rem;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: rgba(255,255,255,0.85);
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+            font-weight: 400;
+        }
+
+        .hero-formula-card {
+            background: var(--white);
+            border-radius: 8px;
+            padding: 1.75rem 2.5rem;
+            box-shadow: var(--shadow-lg);
+            display: inline-block;
+        }
+
+        .hero-formula-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-formula {
+            font-family: 'Roboto Slab', serif;
+            font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+            color: var(--gray-800);
+            font-weight: 500;
+        }
+
+        .hero-formula .delta { color: var(--mdlz-purple); }
+        .hero-formula .market { color: var(--mdlz-blue); }
+        .hero-formula .share { color: var(--mdlz-green); }
+        .hero-formula .op { color: var(--gray-400); }
+
+        /* Sections */
+        section {
+            padding: 5rem 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .full-width-section {
+            max-width: 100%;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        .full-width-section > .section-header,
+        .full-width-section > .content-wrapper {
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-header {
+            margin-bottom: 3rem;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--mdlz-purple);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+        }
+
+        .section-title {
+            font-family: 'Roboto Slab', serif;
+            font-size: clamp(1.75rem, 3vw, 2.25rem);
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.75rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.0625rem;
+            color: var(--gray-600);
+            max-width: 700px;
+        }
+
+        /* Content Cards */
+        .content-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .content-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .content-card h3 {
+            font-family: 'Roboto Slab', serif;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+        }
+
+        .content-card h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .content-card h4:first-child {
+            margin-top: 0;
+        }
+
+        .content-card p {
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        .content-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .content-card ul, .content-card ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--gray-600);
+        }
+
+        .content-card li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        /* Motivation Section */
+        #motivacion {
+            background: var(--gray-50);
+        }
+
+        .motivation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .motivation-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .motivation-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .motivation-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--mdlz-purple-lighter);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+        }
+
+        .motivation-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .motivation-card p {
+            color: var(--gray-600);
+            font-size: 0.9375rem;
+            line-height: 1.5;
+        }
+
+        /* Formula Box */
+        .formula-box {
+            background: var(--gray-50);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.25rem 1.5rem;
+            font-family: 'Roboto Slab', serif;
+            font-size: 1.0625rem;
+            color: var(--gray-800);
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .formula-box.large {
+            font-size: 1.25rem;
+            padding: 1.5rem 2rem;
+            text-align: center;
+        }
+
+        .formula-box .var { color: var(--mdlz-purple); }
+        .formula-box .market { color: var(--mdlz-blue); }
+        .formula-box .share { color: var(--mdlz-green); }
+        .formula-box .op { color: var(--gray-400); }
+        .formula-box .highlight { color: var(--mdlz-orange); }
+
+        .formula-explanation {
+            background: rgba(75, 40, 109, 0.05);
+            border-left: 4px solid var(--mdlz-purple);
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .formula-explanation p {
+            margin-bottom: 0.5rem;
+            font-size: 0.9375rem;
+        }
+
+        .formula-explanation p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Definition List */
+        .definition-list {
+            display: grid;
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+
+        .definition-item {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            background: var(--gray-50);
+            border-radius: 6px;
+            align-items: start;
+        }
+
+        .definition-term {
+            font-family: 'Roboto Slab', serif;
+            font-weight: 600;
+            color: var(--mdlz-purple);
+            font-size: 0.9375rem;
+        }
+
+        .definition-desc {
+            color: var(--gray-600);
+            font-size: 0.9375rem;
+            line-height: 1.5;
+        }
+
+        /* Theory Steps */
+        .theory-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .theory-step {
+            display: grid;
+            grid-template-columns: 48px 1fr;
+            gap: 1.25rem;
+            align-items: start;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: var(--mdlz-purple);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Roboto Slab', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .step-content h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.75rem;
+        }
+
+        .step-content p {
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+            font-size: 0.9375rem;
+            line-height: 1.6;
+        }
+
+        /* Decomposition Visual */
+        .decomposition-visual {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin-top: 2.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .decomposition-title {
+            text-align: center;
+            font-family: 'Roboto Slab', serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 2rem;
+        }
+
+        .decomposition-diagram {
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .effect-box {
+            flex: 1;
+            min-width: 200px;
+            max-width: 280px;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid;
+        }
+
+        .effect-box.total {
+            background: rgba(75, 40, 109, 0.05);
+            border-color: var(--mdlz-purple);
+        }
+
+        .effect-box.market {
+            background: rgba(41, 128, 185, 0.05);
+            border-color: var(--mdlz-blue);
+        }
+
+        .effect-box.share {
+            background: rgba(46, 139, 87, 0.05);
+            border-color: var(--mdlz-green);
+        }
+
+        .effect-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+        }
+
+        .effect-box.total .effect-label { color: var(--mdlz-purple); }
+        .effect-box.market .effect-label { color: var(--mdlz-blue); }
+        .effect-box.share .effect-label { color: var(--mdlz-green); }
+
+        .effect-formula {
+            font-family: 'Roboto Slab', serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--gray-800);
+            margin-bottom: 0.75rem;
+        }
+
+        .effect-description {
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            line-height: 1.4;
+        }
+
+        .operator {
+            font-family: 'Roboto Slab', serif;
+            font-size: 1.5rem;
+            color: var(--gray-400);
+            display: flex;
+            align-items: center;
+            padding: 0 0.5rem;
+        }
+
+        /* Metrics Table */
+        .metrics-table {
+            width: 100%;
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .metrics-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .metrics-table thead {
+            background: var(--mdlz-purple);
+            color: var(--white);
+        }
+
+        .metrics-table th {
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .metrics-table th:first-child {
+            width: 30%;
+        }
+
+        .metrics-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9375rem;
+            vertical-align: top;
+        }
+
+        .metrics-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .metrics-table tr:hover {
+            background: var(--gray-50);
+        }
+
+        .metric-name {
+            font-weight: 600;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .metric-badge {
+            display: inline-block;
+            padding: 0.125rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .metric-badge.purple { background: rgba(75, 40, 109, 0.1); color: var(--mdlz-purple); }
+        .metric-badge.blue { background: rgba(41, 128, 185, 0.1); color: var(--mdlz-blue); }
+        .metric-badge.green { background: rgba(46, 139, 87, 0.1); color: var(--mdlz-green); }
+        .metric-badge.orange { background: rgba(245, 166, 35, 0.15); color: var(--mdlz-orange-dark); }
+
+        .formula-cell {
+            font-family: 'Roboto Slab', serif;
+            font-size: 0.875rem;
+            color: var(--gray-700);
+        }
+
+        .description-cell {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .avg-note {
+            font-style: italic;
+            color: var(--gray-500);
+            font-size: 0.8125rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Example Tables */
+        .example-section {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .example-header {
+            background: var(--gray-50);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .example-header h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.25rem;
+        }
+
+        .example-header p {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .example-content {
+            padding: 1.5rem;
+        }
+
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .example-input {
+            background: var(--gray-50);
+            border-radius: 6px;
+            padding: 1rem;
+        }
+
+        .example-input-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .example-input-value {
+            font-family: 'Roboto Slab', serif;
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+
+        .calculation-steps {
+            background: var(--gray-50);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .calculation-steps h5 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 1rem;
+        }
+
+        .calc-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .calc-step:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .calc-number {
+            width: 24px;
+            height: 24px;
+            background: var(--mdlz-purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--white);
+            flex-shrink: 0;
+        }
+
+        .calc-content {
+            flex: 1;
+        }
+
+        .calc-content p {
+            font-size: 0.9375rem;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .calc-formula {
+            font-family: 'Roboto Slab', serif;
+            font-size: 0.9375rem;
+            color: var(--gray-800);
+            background: var(--white);
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .results-table thead {
+            background: var(--mdlz-purple-lighter);
+        }
+
+        .results-table th {
+            padding: 0.75rem 1rem;
+            text-align: right;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--mdlz-purple-dark);
+        }
+
+        .results-table th:first-child {
+            text-align: left;
+        }
+
+        .results-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            text-align: right;
+            font-size: 0.875rem;
+        }
+
+        .results-table td:first-child {
+            text-align: left;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .results-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .results-table .positive { color: var(--positive); font-weight: 600; }
+        .results-table .negative { color: var(--negative); font-weight: 600; }
+        .results-table .total-col { background: rgba(75, 40, 109, 0.05); font-weight: 600; }
+
+        .interpretation-box {
+            background: rgba(46, 139, 87, 0.08);
+            border-left: 4px solid var(--mdlz-green);
+            padding: 1.25rem 1.5rem;
+            margin-top: 1.5rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .interpretation-box h5 {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--mdlz-green);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .interpretation-box p {
+            color: var(--gray-700);
+            font-size: 0.9375rem;
+            line-height: 1.6;
+        }
+
+        /* Verification Box */
+        .verification-box {
+            background: rgba(41, 128, 185, 0.08);
+            border-left: 4px solid var(--mdlz-blue);
+            padding: 1.25rem 1.5rem;
+            margin-top: 1rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .verification-box h5 {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--mdlz-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .verification-box p {
+            color: var(--gray-700);
+            font-size: 0.9375rem;
+            line-height: 1.6;
+            font-family: 'Roboto Slab', serif;
+        }
+
+        /* Cases Section */
+        #casos {
+            background: var(--gray-50);
+        }
+
+        .cases-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .case-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .case-card:hover {
+            box-shadow: var(--shadow-sm);
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            background: var(--white);
+        }
+
+        .case-title-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .case-number {
+            width: 32px;
+            height: 32px;
+            background: var(--mdlz-purple);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .case-title {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .case-badges {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            padding: 0.25rem 0.625rem;
+            border-radius: 4px;
+            font-size: 0.6875rem;
+            font-weight: 600;
+        }
+
+        .badge.market-up { background: rgba(41, 128, 185, 0.1); color: var(--mdlz-blue); }
+        .badge.market-down { background: var(--negative-bg); color: var(--negative); }
+        .badge.market-stable { background: var(--gray-100); color: var(--gray-600); }
+        .badge.share-up { background: var(--positive-bg); color: var(--positive); }
+        .badge.share-down { background: var(--negative-bg); color: var(--negative); }
+        .badge.share-stable { background: var(--gray-100); color: var(--gray-600); }
+
+        .case-content {
+            padding: 0 1.5rem 1.5rem;
+            display: none;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .case-card.active .case-content {
+            display: block;
+            padding-top: 1.5rem;
+        }
+
+        .case-data {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .data-item {
+            background: var(--gray-50);
+            border-radius: 6px;
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .data-label {
+            font-size: 0.625rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .data-value {
+            font-family: 'Roboto Slab', serif;
+            font-size: 0.9375rem;
+            font-weight: 500;
+        }
+
+        .data-value.positive { color: var(--positive); }
+        .data-value.negative { color: var(--negative); }
+        .data-value.neutral { color: var(--gray-800); }
+
+        .case-calculations {
+            background: var(--gray-50);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .case-calculations h5 {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.75rem;
+        }
+
+        .case-calc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .case-calc-item:last-child {
+            border-bottom: none;
+        }
+
+        .case-calc-label {
+            color: var(--gray-600);
+        }
+
+        .case-calc-formula {
+            font-family: 'Roboto Slab', serif;
+            color: var(--gray-700);
+        }
+
+        .case-interpretation {
+            background: rgba(75, 40, 109, 0.05);
+            border-left: 4px solid var(--mdlz-purple);
+            border-radius: 0 6px 6px 0;
+            padding: 1rem 1.25rem;
+        }
+
+        .case-interpretation-title {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: var(--mdlz-purple);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.375rem;
+        }
+
+        .case-interpretation p {
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .toggle-icon {
+            width: 20px;
+            height: 20px;
+            stroke: var(--gray-400);
+            transition: transform 0.2s ease;
+        }
+
+        .case-card.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Evaluation Section */
+        .evaluation-table {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .eval-header {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            background: var(--mdlz-purple);
+        }
+
+        .eval-header-cell {
+            padding: 1rem 1.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--white);
+        }
+
+        .eval-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s ease;
+        }
+
+        .eval-row:last-child {
+            border-bottom: none;
+        }
+
+        .eval-row:hover {
+            background: var(--gray-50);
+        }
+
+        .eval-cell {
+            padding: 1.25rem;
+        }
+
+        .condition-cell {
+            font-family: 'Roboto Slab', serif;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            color: var(--gray-700);
+        }
+
+        .condition-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .condition-indicator.double-positive { background: var(--positive); }
+        .condition-indicator.defense { background: var(--mdlz-blue); }
+        .condition-indicator.borrowed { background: var(--mdlz-orange); }
+        .condition-indicator.double-negative { background: var(--negative); }
+        .condition-indicator.neutral { background: var(--gray-400); }
+
+        .interpretation-cell {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .interpretation-cell strong {
+            color: var(--gray-800);
+        }
+
+        /* Foundation Section */
+        #fundamento {
+            background: var(--gray-50);
+        }
+
+        .foundation-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .foundation-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .foundation-card h3 {
+            font-family: 'Roboto Slab', serif;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .foundation-card h3 span {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--mdlz-purple-lighter);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .foundation-card p {
+            color: var(--gray-600);
+            font-size: 0.9375rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+        }
+
+        .foundation-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .reference-list {
+            list-style: none;
+            margin-top: 1.25rem;
+        }
+
+        .reference-list li {
+            padding: 0.75rem 1rem;
+            background: var(--gray-50);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .reference-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .reference-list li strong {
+            color: var(--gray-800);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--mdlz-purple-dark);
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-family: 'Roboto Slab', serif;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-text {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.8125rem;
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 0 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero {
+                padding: 5rem 1.5rem 3rem;
+            }
+
+            section {
+                padding: 3.5rem 1.5rem;
+            }
+
+            .theory-step {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .step-number {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .decomposition-diagram {
+                flex-direction: column;
+            }
+
+            .operator {
+                transform: rotate(90deg);
+                padding: 0.5rem 0;
+            }
+
+            .effect-box {
+                max-width: 100%;
+            }
+
+            .case-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .case-badges {
+                flex-wrap: wrap;
+            }
+
+            .case-data {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .eval-header,
+            .eval-row {
+                grid-template-columns: 1fr;
+            }
+
+            .eval-header-cell:last-child {
+                display: none;
+            }
+
+            .condition-cell {
+                border-bottom: 1px dashed var(--border-color);
+                padding-bottom: 0.75rem;
+            }
+
+            .metrics-table {
+                overflow-x: auto;
+            }
+
+            .metrics-table table {
+                min-width: 600px;
+            }
+
+            .definition-item {
+                grid-template-columns: 1fr;
+                gap: 0.25rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            nav, .scroll-indicator {
+                display: none;
+            }
+            
+            .hero {
+                min-height: auto;
+                padding: 2rem;
+            }
+            
+            section {
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-brand">
+            <div class="nav-logo">M</div>
+            <span class="nav-title">MDLZ Analytics</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#motivacion">Motivación</a></li>
+            <li><a href="#definiciones">Definiciones</a></li>
+            <li><a href="#teoria">Metodología</a></li>
+            <li><a href="#estructura">Estructura</a></li>
+            <li><a href="#ejemplos">Ejemplos</a></li>
+            <li><a href="#casos">Casos</a></li>
+            <li><a href="#evaluacion">Evaluación</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-tag">Metodología de Análisis</div>
+            <h1>Descomposición del Volumen MDLZ</h1>
+            <p class="hero-subtitle">
+                Separando el efecto del mercado del esfuerzo competitivo para una evaluación precisa del desempeño comercial.
+            </p>
+            <div class="hero-formula-card">
+                <div class="hero-formula-label">Fórmula de Descomposición</div>
+                <div class="hero-formula">
+                    <span class="delta">ΔM</span> <span class="op">=</span> 
+                    <span class="market">s₀(Tₜ − T₀)</span> <span class="op">+</span> 
+                    <span class="share">Tₜ(sₜ − s₀)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="motivacion" class="full-width-section" style="background: var(--gray-50);">
+        <div class="section-header">
+            <div class="section-label">01. Motivación</div>
+            <h2 class="section-title">¿Por qué una nueva metodología?</h2>
+            <p class="section-subtitle">Identificamos oportunidades de mejora en el análisis actual que esta metodología resuelve de manera rigurosa.</p>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="content-card">
+                <h3>Contexto del análisis actual</h3>
+                <p>Actualmente, el análisis de desempeño de MDLZ utiliza métricas como el <strong>Share Change</strong> y el <strong>Kg MDLZ Change</strong>. Una práctica común es calcular el ratio entre estos valores para obtener los "Kg equivalentes a 1 punto porcentual":</p>
+                
+                <div class="formula-box">
+                    Kg por 1 pp = ΔKg MDLZ ÷ ΔShare (pp)
+                </div>
+
+                <p>Este ratio presenta algunas características que dificultan su interpretación en ciertos escenarios:</p>
+
+                <h4>1. Comportamiento con signos diferentes</h4>
+                <p>Cuando el mercado cae pero MDLZ gana share, el volumen de MDLZ puede disminuir (ΔKg negativo) mientras que el share aumenta (ΔShare positivo). El ratio resultante es negativo, lo cual no refleja adecuadamente que MDLZ tuvo un buen desempeño competitivo al ganar participación en un mercado en contracción.</p>
+
+                <h4>2. Sensibilidad cuando ΔShare es pequeño</h4>
+                <p>Cuando el cambio de share es cercano a cero, el denominador se vuelve muy pequeño y el ratio crece exponencialmente, produciendo valores que no tienen una interpretación práctica clara.</p>
+
+                <h4>3. Efectos combinados</h4>
+                <p>El ratio mezcla dos fenómenos distintos: el efecto del tamaño del mercado y el efecto del cambio de participación. Esto dificulta identificar qué parte del crecimiento de MDLZ se debe al crecimiento de la categoría y qué parte se debe a ganar participación.</p>
+
+                <h4>4. Agregación de múltiples periodos</h4>
+                <p>Al tener periodos con valores positivos y negativos, la agregación (promedio o suma) de estos ratios requiere un tratamiento especial para mantener una interpretación económica coherente.</p>
+            </div>
+
+            <div class="content-card">
+                <h3>Solución propuesta</h3>
+                <p>Esta metodología propone una <strong>descomposición algebraica</strong> del cambio de volumen de MDLZ en dos componentes claramente identificables:</p>
+                
+                <div class="motivation-grid" style="margin-top: 1.5rem;">
+                    <div class="motivation-card">
+                        <div class="motivation-icon" style="background: rgba(41, 128, 185, 0.15);">📊</div>
+                        <h3>Efecto Mercado</h3>
+                        <p>Kg que MDLZ ganaría o perdería únicamente por el cambio en el tamaño de la categoría, manteniendo su participación constante.</p>
+                    </div>
+                    <div class="motivation-card">
+                        <div class="motivation-icon" style="background: rgba(46, 139, 87, 0.15);">🎯</div>
+                        <h3>Efecto Share</h3>
+                        <p>Kg que MDLZ gana o pierde por cambiar su participación de mercado, dado el tamaño actual de la categoría. Representa el esfuerzo competitivo.</p>
+                    </div>
+                </div>
+
+                <p style="margin-top: 1.5rem;">Esta separación permite:</p>
+                <ul>
+                    <li>Identificar claramente cuánto del crecimiento proviene del mercado vs. del esfuerzo competitivo</li>
+                    <li>Valores siempre interpretables independientemente de los signos</li>
+                    <li>Agregación consistente para múltiples periodos</li>
+                    <li>Base matemática sólida respaldada por metodologías económicas establecidas</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section id="definiciones">
+        <div class="section-header">
+            <div class="section-label">02. Definiciones</div>
+            <h2 class="section-title">Variables y Notación</h2>
+            <p class="section-subtitle">Definición formal de cada variable utilizada en la metodología.</p>
+        </div>
+
+        <div class="content-card">
+            <h3>Variables por periodo</h3>
+            <p>Para cada periodo de análisis <strong>t</strong> (puede ser un mes, un trimestre, o cualquier periodo definido), y un periodo de referencia <strong>0</strong> (año anterior, mes anterior, etc.):</p>
+
+            <div class="definition-list">
+                <div class="definition-item">
+                    <div class="definition-term">Tₜ</div>
+                    <div class="definition-desc">Volumen total de la <strong>categoría</strong> en el periodo actual (en Kg). Es la suma de todos los competidores incluyendo MDLZ.</div>
+                </div>
+                <div class="definition-item">
+                    <div class="definition-term">T₀</div>
+                    <div class="definition-desc">Volumen total de la <strong>categoría</strong> en el periodo de referencia (en Kg).</div>
+                </div>
+                <div class="definition-item">
+                    <div class="definition-term">Mₜ</div>
+                    <div class="definition-desc">Volumen de <strong>MDLZ</strong> en el periodo actual (en Kg).</div>
+                </div>
+                <div class="definition-item">
+                    <div class="definition-term">M₀</div>
+                    <div class="definition-desc">Volumen de <strong>MDLZ</strong> en el periodo de referencia (en Kg).</div>
+                </div>
+                <div class="definition-item">
+                    <div class="definition-term">sₜ</div>
+                    <div class="definition-desc">Participación de mercado (share) de MDLZ en el periodo actual. Se calcula como: <strong>sₜ = Mₜ / Tₜ</strong></div>
+                </div>
+                <div class="definition-item">
+                    <div class="definition-term">s₀</div>
+                    <div class="definition-desc">Participación de mercado (share) de MDLZ en el periodo de referencia. Se calcula como: <strong>s₀ = M₀ / T₀</strong></div>
+                </div>
+                <div class="definition-item">
+                    <div class="definition-term">ΔM</div>
+                    <div class="definition-desc">Cambio en el volumen de MDLZ entre periodos. Se calcula como: <strong>ΔM = Mₜ − M₀</strong></div>
+                </div>
+            </div>
+
+            <div class="formula-explanation">
+                <p><strong>Nota sobre unidades:</strong> Los volúmenes (T, M) están expresados en Kg. Las participaciones (s) son proporciones decimales (ejemplo: 20% = 0.20). El share change en puntos porcentuales (pp) se obtiene multiplicando por 100: <strong>(sₜ − s₀) × 100</strong>.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="teoria" class="full-width-section" style="background: var(--gray-50);">
+        <div class="section-header">
+            <div class="section-label">03. Metodología</div>
+            <h2 class="section-title">Demostración de la Descomposición</h2>
+            <p class="section-subtitle">Desarrollo algebraico paso a paso de la fórmula de descomposición.</p>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="theory-container">
+                <div class="theory-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Identidad Fundamental</h3>
+                        <p>Por definición, el volumen de MDLZ en cualquier periodo es igual a su participación de mercado multiplicada por el tamaño total de la categoría:</p>
+                        <div class="formula-box large">
+                            <span class="var">Mₜ</span> <span class="op">=</span> <span class="var">sₜ</span> <span class="op">×</span> <span class="var">Tₜ</span>
+                        </div>
+                        <div class="formula-explanation">
+                            <p><strong>Interpretación:</strong> Esta identidad establece que el volumen de MDLZ depende de dos factores: qué porción del mercado tiene (sₜ) y qué tan grande es el mercado total (Tₜ).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theory-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Expresión del Cambio Total</h3>
+                        <p>El cambio de volumen de MDLZ entre el periodo base (0) y el periodo actual (t) se define como:</p>
+                        <div class="formula-box large">
+                            <span class="var">ΔM</span> <span class="op">=</span> <span class="var">Mₜ</span> <span class="op">−</span> <span class="var">M₀</span>
+                        </div>
+                        <p>Aplicando la identidad del paso 1 a ambos términos:</p>
+                        <div class="formula-box large">
+                            <span class="var">ΔM</span> <span class="op">=</span> <span class="var">sₜ × Tₜ</span> <span class="op">−</span> <span class="var">s₀ × T₀</span>
+                        </div>
+                        <div class="formula-explanation">
+                            <p><strong>Interpretación:</strong> El cambio total de volumen es la diferencia entre el producto share × mercado del periodo actual y el mismo producto del periodo base.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theory-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Introducción del Término Auxiliar</h3>
+                        <p>Para poder separar los efectos, sumamos y restamos el término <strong>s₀ × Tₜ</strong>. Este es un artificio algebraico que no cambia el valor de la expresión (sumar y restar el mismo término da cero):</p>
+                        <div class="formula-box large">
+                            <span class="var">ΔM</span> <span class="op">=</span> sₜ×Tₜ <span class="op">−</span> <span class="highlight">s₀×Tₜ</span> <span class="op">+</span> <span class="highlight">s₀×Tₜ</span> <span class="op">−</span> s₀×T₀
+                        </div>
+                        <div class="formula-explanation">
+                            <p><strong>¿Por qué s₀ × Tₜ?</strong> Este término representa un escenario hipotético: "¿Cuántos Kg tendría MDLZ si mantuviera el share del periodo base (s₀) pero con el tamaño de mercado actual (Tₜ)?"</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theory-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Reagrupación de Términos</h3>
+                        <p>Ahora agrupamos los términos de forma conveniente:</p>
+                        <div class="formula-box">
+                            ΔM = (<span class="var">sₜ×Tₜ − s₀×Tₜ</span>) + (<span class="var">s₀×Tₜ − s₀×T₀</span>)
+                        </div>
+                        <p>En el primer paréntesis, Tₜ es factor común. En el segundo paréntesis, s₀ es factor común:</p>
+                        <div class="formula-box large">
+                            <span class="var">ΔM</span> <span class="op">=</span> <span class="share">Tₜ × (sₜ − s₀)</span> <span class="op">+</span> <span class="market">s₀ × (Tₜ − T₀)</span>
+                        </div>
+                        <div class="formula-explanation">
+                            <p><strong>Esta es la descomposición final:</strong></p>
+                            <p>• <strong style="color: var(--mdlz-green);">Tₜ × (sₜ − s₀)</strong> = Efecto Share (esfuerzo competitivo de MDLZ)</p>
+                            <p>• <strong style="color: var(--mdlz-blue);">s₀ × (Tₜ − T₀)</strong> = Efecto Mercado (impacto del tamaño de categoría)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="theory-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Verificación de la Identidad</h3>
+                        <p>Podemos verificar que la descomposición es correcta expandiendo los términos:</p>
+                        <div class="formula-box">
+                            Tₜ×(sₜ − s₀) + s₀×(Tₜ − T₀) = Tₜ×sₜ − Tₜ×s₀ + s₀×Tₜ − s₀×T₀
+                        </div>
+                        <p>Simplificando (los términos −Tₜ×s₀ y +s₀×Tₜ se cancelan):</p>
+                        <div class="formula-box">
+                            = Tₜ×sₜ − s₀×T₀ = Mₜ − M₀ = ΔM ✓
+                        </div>
+                        <div class="formula-explanation">
+                            <p><strong>Conclusión:</strong> La suma de los dos efectos es exactamente igual al cambio total de volumen de MDLZ. No hay término residual ni aproximación.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="decomposition-visual">
+                <h3 class="decomposition-title">Resumen de la Descomposición</h3>
+                <div class="decomposition-diagram">
+                    <div class="effect-box total">
+                        <div class="effect-label">Cambio Total</div>
+                        <div class="effect-formula">ΔM = Mₜ − M₀</div>
+                        <div class="effect-description">Variación neta del volumen MDLZ entre periodos</div>
+                    </div>
+                    <div class="operator">=</div>
+                    <div class="effect-box market">
+                        <div class="effect-label">Efecto Mercado</div>
+                        <div class="effect-formula">s₀ × (Tₜ − T₀)</div>
+                        <div class="effect-description">Kg que cambiarían manteniendo share constante</div>
+                    </div>
+                    <div class="operator">+</div>
+                    <div class="effect-box share">
+                        <div class="effect-label">Efecto Share</div>
+                        <div class="effect-formula">Tₜ × (sₜ − s₀)</div>
+                        <div class="effect-description">Kg por cambio de participación de mercado</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-card" style="margin-top: 2rem;">
+                <h3>Interpretación de Cada Componente</h3>
+                
+                <h4>Efecto Mercado: s₀ × (Tₜ − T₀)</h4>
+                <p>Imagina un escenario donde MDLZ <strong>no hace nada diferente</strong>: mantiene exactamente el mismo share que tenía en el periodo base (s₀). En ese caso, si el mercado total crece de T₀ a Tₜ, MDLZ automáticamente venderá más simplemente porque el "pastel" es más grande.</p>
+                <p>Este componente responde a la pregunta: <strong>"¿Cuántos Kg ganaría o perdería MDLZ solo por el cambio en el tamaño de la categoría?"</strong></p>
+
+                <h4>Efecto Share: Tₜ × (sₜ − s₀)</h4>
+                <p>Una vez que el mercado ya está en su tamaño actual (Tₜ), este componente mide cuántos Kg adicionales tiene MDLZ por haber cambiado su participación de s₀ a sₜ.</p>
+                <p>Este componente responde a la pregunta: <strong>"¿Cuántos Kg gana o pierde MDLZ por su desempeño competitivo, es decir, por ganar o perder participación de mercado?"</strong></p>
+            </div>
+        </div>
+    </section>
+
+    <section id="estructura">
+        <div class="section-header">
+            <div class="section-label">04. Estructura de Métricas</div>
+            <h2 class="section-title">Tabla de Análisis Recomendada</h2>
+            <p class="section-subtitle">Estructura para el reporte por país, categoría y periodo, incluyendo la columna de agregación.</p>
+        </div>
+
+        <div class="content-card">
+            <h3>Variables de entrada requeridas</h3>
+            <p>Para aplicar esta metodología, se necesitan los siguientes datos por cada periodo:</p>
+            <div class="definition-list">
+                <div class="definition-item">
+                    <div class="definition-term">Tₜ</div>
+                    <div class="definition-desc">Kg totales de la categoría en el periodo actual</div>
+                </div>
+                <div class="definition-item">
+                    <div class="definition-term">T₀</div>
+                    <div class="definition-desc">Kg totales de la categoría en el periodo de referencia</div>
+                </div>
+                <div class="definition-item">
+                    <div class="definition-term">Mₜ</div>
+                    <div class="definition-desc">Kg de MDLZ en el periodo actual</div>
+                </div>
+                <div class="definition-item">
+                    <div class="definition-term">M₀</div>
+                    <div class="definition-desc">Kg de MDLZ en el periodo de referencia</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="metrics-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Métrica</th>
+                        <th>Fórmula por Periodo</th>
+                        <th>Fórmula AVE / TOTAL</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <span class="metric-name">
+                                1. Share Change (pp)
+                            </span>
+                        </td>
+                        <td class="formula-cell">(sₜ − s₀) × 100</td>
+                        <td class="formula-cell">(Σ Efecto Share / Σ Tₜ) × 100</td>
+                        <td class="description-cell">Cambio de participación de mercado expresado en puntos porcentuales.</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="metric-name">
+                                2. ΔKg MDLZ Total
+                            </span>
+                        </td>
+                        <td class="formula-cell">Mₜ − M₀</td>
+                        <td class="formula-cell">Σ (Mₜ − M₀)</td>
+                        <td class="description-cell">Cambio absoluto en el volumen de MDLZ. Es lo que se observa en el P&L.</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="metric-name">
+                                3. Efecto Mercado (Kg)
+                                <span class="metric-badge blue">Nuevo</span>
+                            </span>
+                        </td>
+                        <td class="formula-cell">s₀ × (Tₜ − T₀)</td>
+                        <td class="formula-cell">Σ [s₀ × (Tₜ − T₀)]</td>
+                        <td class="description-cell">Kg explicados por el cambio en el tamaño de la categoría, asumiendo share constante.</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="metric-name">
+                                4. Efecto Share (Kg)
+                                <span class="metric-badge green">Clave</span>
+                            </span>
+                        </td>
+                        <td class="formula-cell">Tₜ × (sₜ − s₀)</td>
+                        <td class="formula-cell">Σ [Tₜ × (sₜ − s₀)]</td>
+                        <td class="description-cell">Kg explicados por el cambio en la participación de mercado. Representa el esfuerzo competitivo.</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span class="metric-name">
+                                5. Kg Equiv. 1 pp
+                                <span class="metric-badge orange">Referencia</span>
+                            </span>
+                        </td>
+                        <td class="formula-cell">Tₜ / 100</td>
+                        <td class="formula-cell">(Σ Tₜ) / 100</td>
+                        <td class="description-cell">Cuántos Kg representa 1 punto porcentual de share en este mercado.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content-card">
+            <h3>Relación entre las métricas</h3>
+            <p>Las métricas están relacionadas algebraicamente de la siguiente manera:</p>
+            
+            <div class="formula-box large">
+                <span class="var">ΔKg MDLZ Total</span> <span class="op">=</span> <span class="market">Efecto Mercado</span> <span class="op">+</span> <span class="share">Efecto Share</span>
+            </div>
+
+            <p>Esta identidad se cumple tanto para cada periodo individual como para los totales agregados:</p>
+            
+            <div class="formula-box">
+                Σ ΔKg = Σ Efecto Mercado + Σ Efecto Share
+            </div>
+
+            <h4>Derivación de "Kg Equiv. 1 pp"</h4>
+            <p>El indicador Kg Equivalente a 1 pp también puede derivarse del Efecto Share:</p>
+            <div class="formula-box">
+                Kg Equiv. 1 pp = Efecto Share (Kg) ÷ Share Change (pp) = [Tₜ × (sₜ − s₀)] ÷ [(sₜ − s₀) × 100] = Tₜ / 100
+            </div>
+            <p>Esto significa que 1 punto porcentual de share equivale al 1% del volumen total de la categoría.</p>
+        </div>
+    </section>
+
+    <section id="ejemplos" class="full-width-section" style="background: var(--gray-50);">
+        <div class="section-header">
+            <div class="section-label">05. Ejemplos Detallados</div>
+            <h2 class="section-title">Cálculos Paso a Paso</h2>
+            <p class="section-subtitle">Ejemplos numéricos completos mostrando el proceso de cálculo de cada métrica.</p>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- Ejemplo 1: Periodo único -->
+            <div class="example-section">
+                <div class="example-header">
+                    <h4>Ejemplo 1: Cálculo para un periodo único</h4>
+                    <p>Datos de entrada para el periodo P01</p>
+                </div>
+                <div class="example-content">
+                    <div class="example-grid">
+                        <div class="example-input">
+                            <div class="example-input-label">T₀ (Categoría Base)</div>
+                            <div class="example-input-value">100,000 Kg</div>
+                        </div>
+                        <div class="example-input">
+                            <div class="example-input-label">Tₜ (Categoría Actual)</div>
+                            <div class="example-input-value">110,000 Kg</div>
+                        </div>
+                        <div class="example-input">
+                            <div class="example-input-label">M₀ (MDLZ Base)</div>
+                            <div class="example-input-value">20,000 Kg</div>
+                        </div>
+                        <div class="example-input">
+                            <div class="example-input-label">Mₜ (MDLZ Actual)</div>
+                            <div class="example-input-value">24,200 Kg</div>
+                        </div>
+                    </div>
+
+                    <div class="calculation-steps">
+                        <h5>Proceso de cálculo</h5>
+                        
+                        <div class="calc-step">
+                            <div class="calc-number">1</div>
+                            <div class="calc-content">
+                                <p><strong>Calcular shares:</strong></p>
+                                <div class="calc-formula">s₀ = M₀ / T₀ = 20,000 / 100,000 = 0.20 (20%)</div>
+                                <div class="calc-formula">sₜ = Mₜ / Tₜ = 24,200 / 110,000 = 0.22 (22%)</div>
+                            </div>
+                        </div>
+
+                        <div class="calc-step">
+                            <div class="calc-number">2</div>
+                            <div class="calc-content">
+                                <p><strong>Calcular Share Change (pp):</strong></p>
+                                <div class="calc-formula">Share Change = (sₜ − s₀) × 100 = (0.22 − 0.20) × 100 = +2.0 pp</div>
+                            </div>
+                        </div>
+
+                        <div class="calc-step">
+                            <div class="calc-number">3</div>
+                            <div class="calc-content">
+                                <p><strong>Calcular ΔKg MDLZ Total:</strong></p>
+                                <div class="calc-formula">ΔKg = Mₜ − M₀ = 24,200 − 20,000 = +4,200 Kg</div>
+                            </div>
+                        </div>
+
+                        <div class="calc-step">
+                            <div class="calc-number">4</div>
+                            <div class="calc-content">
+                                <p><strong>Calcular Efecto Mercado:</strong></p>
+                                <div class="calc-formula">Efecto Mercado = s₀ × (Tₜ − T₀) = 0.20 × (110,000 − 100,000) = 0.20 × 10,000 = +2,000 Kg</div>
+                            </div>
+                        </div>
+
+                        <div class="calc-step">
+                            <div class="calc-number">5</div>
+                            <div class="calc-content">
+                                <p><strong>Calcular Efecto Share:</strong></p>
+                                <div class="calc-formula">Efecto Share = Tₜ × (sₜ − s₀) = 110,000 × (0.22 − 0.20) = 110,000 × 0.02 = +2,200 Kg</div>
+                            </div>
+                        </div>
+
+                        <div class="calc-step">
+                            <div class="calc-number">6</div>
+                            <div class="calc-content">
+                                <p><strong>Calcular Kg Equiv. 1 pp:</strong></p>
+                                <div class="calc-formula">Kg Equiv. 1 pp = Tₜ / 100 = 110,000 / 100 = 1,100 Kg por pp</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="verification-box">
+                        <h5>Verificación de la identidad</h5>
+                        <p>Efecto Mercado + Efecto Share = 2,000 + 2,200 = 4,200 Kg = ΔKg MDLZ Total ✓</p>
+                    </div>
+
+                    <div class="interpretation-box">
+                        <h5>Interpretación del resultado</h5>
+                        <p>MDLZ creció <strong>+4,200 Kg</strong> en este periodo. De ese crecimiento:</p>
+                        <p>• <strong>+2,000 Kg</strong> (48%) se explican porque la categoría creció (efecto mercado)</p>
+                        <p>• <strong>+2,200 Kg</strong> (52%) se explican porque MDLZ ganó 2 pp de share (esfuerzo competitivo)</p>
+                        <p>En este mercado, <strong>1 pp de share equivale a 1,100 Kg</strong>.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ejemplo 2: Múltiples periodos -->
+            <div class="example-section">
+                <div class="example-header">
+                    <h4>Ejemplo 2: Agregación de múltiples periodos</h4>
+                    <p>Cálculo para dos periodos (P01 y P02) y columna TOTAL</p>
+                </div>
+                <div class="example-content">
+                    <h5 style="margin-bottom: 1rem; color: var(--gray-700);">Datos de entrada:</h5>
+                    
+                    <table class="results-table" style="margin-bottom: 2rem;">
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>P01</th>
+                                <th>P02</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>T₀ (Categoría Base)</td>
+                                <td>100,000 Kg</td>
+                                <td>110,000 Kg</td>
+                            </tr>
+                            <tr>
+                                <td>Tₜ (Categoría Actual)</td>
+                                <td>110,000 Kg</td>
+                                <td>105,000 Kg</td>
+                            </tr>
+                            <tr>
+                                <td>M₀ (MDLZ Base)</td>
+                                <td>20,000 Kg</td>
+                                <td>24,200 Kg</td>
+                            </tr>
+                            <tr>
+                                <td>Mₜ (MDLZ Actual)</td>
+                                <td>24,200 Kg</td>
+                                <td>22,050 Kg</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="calculation-steps">
+                        <h5>Cálculos para P01</h5>
+                        <div class="calc-step">
+                            <div class="calc-number">1</div>
+                            <div class="calc-content">
+                                <div class="calc-formula">s₀ = 20,000 / 100,000 = 0.20 (20%)</div>
+                                <div class="calc-formula">sₜ = 24,200 / 110,000 = 0.22 (22%)</div>
+                                <div class="calc-formula">Share Change = +2.0 pp</div>
+                            </div>
+                        </div>
+                        <div class="calc-step">
+                            <div class="calc-number">2</div>
+                            <div class="calc-content">
+                                <div class="calc-formula">ΔKg = 24,200 − 20,000 = +4,200 Kg</div>
+                                <div class="calc-formula">Efecto Mercado = 0.20 × (110,000 − 100,000) = +2,000 Kg</div>
+                                <div class="calc-formula">Efecto Share = 110,000 × 0.02 = +2,200 Kg</div>
+                                <div class="calc-formula">Kg/pp = 110,000 / 100 = 1,100 Kg</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="calculation-steps">
+                        <h5>Cálculos para P02</h5>
+                        <div class="calc-step">
+                            <div class="calc-number">1</div>
+                            <div class="calc-content">
+                                <div class="calc-formula">s₀ = 24,200 / 110,000 = 0.22 (22%)</div>
+                                <div class="calc-formula">sₜ = 22,050 / 105,000 = 0.21 (21%)</div>
+                                <div class="calc-formula">Share Change = −1.0 pp</div>
+                            </div>
+                        </div>
+                        <div class="calc-step">
+                            <div class="calc-number">2</div>
+                            <div class="calc-content">
+                                <div class="calc-formula">ΔKg = 22,050 − 24,200 = −2,150 Kg</div>
+                                <div class="calc-formula">Efecto Mercado = 0.22 × (105,000 − 110,000) = 0.22 × (−5,000) = −1,100 Kg</div>
+                                <div class="calc-formula">Efecto Share = 105,000 × (−0.01) = −1,050 Kg</div>
+                                <div class="calc-formula">Kg/pp = 105,000 / 100 = 1,050 Kg</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 style="margin: 2rem 0 1rem; color: var(--gray-700);">Tabla de resultados completa:</h5>
+                    
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Métrica</th>
+                                <th>P01</th>
+                                <th>P02</th>
+                                <th class="total-col">TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Share Change (pp)</td>
+                                <td class="positive">+2.0 pp</td>
+                                <td class="negative">−1.0 pp</td>
+                                <td class="total-col">+0.53 pp*</td>
+                            </tr>
+                            <tr>
+                                <td>ΔKg MDLZ Total</td>
+                                <td class="positive">+4,200 Kg</td>
+                                <td class="negative">−2,150 Kg</td>
+                                <td class="total-col positive">+2,050 Kg</td>
+                            </tr>
+                            <tr>
+                                <td>Efecto Mercado (Kg)</td>
+                                <td class="positive">+2,000 Kg</td>
+                                <td class="negative">−1,100 Kg</td>
+                                <td class="total-col positive">+900 Kg</td>
+                            </tr>
+                            <tr>
+                                <td>Efecto Share (Kg)</td>
+                                <td class="positive">+2,200 Kg</td>
+                                <td class="negative">−1,050 Kg</td>
+                                <td class="total-col positive">+1,150 Kg</td>
+                            </tr>
+                            <tr>
+                                <td>Kg Equiv. 1 pp</td>
+                                <td>1,100 Kg</td>
+                                <td>1,050 Kg</td>
+                                <td class="total-col">2,150 Kg**</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="formula-explanation" style="margin-top: 1rem;">
+                        <p><strong>*Cálculo del Share Change ponderado total:</strong></p>
+                        <p>Share Change (pp) = (Σ Efecto Share / Σ Tₜ) × 100 = (1,150 / 215,000) × 100 = +0.53 pp</p>
+                        <p><strong>**Cálculo del Kg Equiv. 1 pp total:</strong></p>
+                        <p>Kg/pp = Σ Tₜ / 100 = (110,000 + 105,000) / 100 = 215,000 / 100 = 2,150 Kg</p>
+                    </div>
+
+                    <div class="verification-box">
+                        <h5>Verificación de la identidad (TOTAL)</h5>
+                        <p>Efecto Mercado + Efecto Share = 900 + 1,150 = 2,050 Kg = ΔKg MDLZ Total ✓</p>
+                    </div>
+
+                    <div class="interpretation-box">
+                        <h5>Interpretación del resultado agregado</h5>
+                        <p>En los dos periodos combinados, MDLZ creció <strong>+2,050 Kg</strong> netos. De ese crecimiento:</p>
+                        <p>• <strong>+900 Kg</strong> (44%) se explican por el efecto mercado (la categoría creció en neto)</p>
+                        <p>• <strong>+1,150 Kg</strong> (56%) se explican por esfuerzo competitivo (ganancia neta de share)</p>
+                        <p>A escala del mercado total del periodo, <strong>1 pp equivale a 2,150 Kg</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="casos" class="full-width-section" style="background: var(--white);">
+        <div class="section-header">
+            <div class="section-label">06. Escenarios de Aplicación</div>
+            <h2 class="section-title">Casos Numéricos Completos</h2>
+            <p class="section-subtitle">Cinco escenarios que ilustran cada combinación posible de efectos.</p>
+        </div>
+
+        <div class="content-wrapper cases-container">
+            <div class="case-card active">
+                <div class="case-header" onclick="toggleCase(this)">
+                    <div class="case-title-group">
+                        <div class="case-number">1</div>
+                        <div class="case-title">Mercado crece, share constante</div>
+                    </div>
+                    <div class="case-badges">
+                        <span class="badge market-up">Mercado ↑</span>
+                        <span class="badge share-stable">Share =</span>
+                    </div>
+                    <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="case-content">
+                    <div class="case-data">
+                        <div class="data-item">
+                            <div class="data-label">T₀ (Cat. Base)</div>
+                            <div class="data-value neutral">100,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Tₜ (Cat. Actual)</div>
+                            <div class="data-value neutral">120,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">M₀ (MDLZ Base)</div>
+                            <div class="data-value neutral">20,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Mₜ (MDLZ Actual)</div>
+                            <div class="data-value neutral">24,000 Kg</div>
+                        </div>
+                    </div>
+                    <div class="case-calculations">
+                        <h5>Cálculos detallados</h5>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">s₀ = M₀/T₀</span>
+                            <span class="case-calc-formula">20,000/100,000 = 0.20 (20%)</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">sₜ = Mₜ/Tₜ</span>
+                            <span class="case-calc-formula">24,000/120,000 = 0.20 (20%)</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">ΔKg MDLZ</span>
+                            <span class="case-calc-formula">24,000 − 20,000 = +4,000 Kg</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">Efecto Mercado</span>
+                            <span class="case-calc-formula">0.20 × (120,000 − 100,000) = +4,000 Kg</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">Efecto Share</span>
+                            <span class="case-calc-formula">120,000 × (0.20 − 0.20) = 0 Kg</span>
+                        </div>
+                    </div>
+                    <div class="case-interpretation">
+                        <div class="case-interpretation-title">Interpretación</div>
+                        <p>El crecimiento de MDLZ (+4,000 Kg) proviene <strong>exclusivamente</strong> del crecimiento de la categoría. MDLZ mantuvo su participación de mercado en 20%, por lo que el efecto share es cero. MDLZ acompañó el crecimiento del mercado sin ganar ni perder competitividad.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="case-card">
+                <div class="case-header" onclick="toggleCase(this)">
+                    <div class="case-title-group">
+                        <div class="case-number">2</div>
+                        <div class="case-title">Mercado estable, MDLZ gana share</div>
+                    </div>
+                    <div class="case-badges">
+                        <span class="badge market-stable">Mercado =</span>
+                        <span class="badge share-up">Share ↑</span>
+                    </div>
+                    <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="case-content">
+                    <div class="case-data">
+                        <div class="data-item">
+                            <div class="data-label">T₀ (Cat. Base)</div>
+                            <div class="data-value neutral">100,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Tₜ (Cat. Actual)</div>
+                            <div class="data-value neutral">100,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">M₀ (MDLZ Base)</div>
+                            <div class="data-value neutral">20,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Mₜ (MDLZ Actual)</div>
+                            <div class="data-value neutral">22,000 Kg</div>
+                        </div>
+                    </div>
+                    <div class="case-calculations">
+                        <h5>Cálculos detallados</h5>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">s₀ = M₀/T₀</span>
+                            <span class="case-calc-formula">20,000/100,000 = 0.20 (20%)</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">sₜ = Mₜ/Tₜ</span>
+                            <span class="case-calc-formula">22,000/100,000 = 0.22 (22%)</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">ΔKg MDLZ</span>
+                            <span class="case-calc-formula">22,000 − 20,000 = +2,000 Kg</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">Efecto Mercado</span>
+                            <span class="case-calc-formula">0.20 × (100,000 − 100,000) = 0 Kg</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">Efecto Share</span>
+                            <span class="case-calc-formula">100,000 × (0.22 − 0.20) = +2,000 Kg</span>
+                        </div>
+                    </div>
+                    <div class="case-interpretation">
+                        <div class="case-interpretation-title">Interpretación</div>
+                        <p>El crecimiento de MDLZ (+2,000 Kg) es <strong>100% atribuible al esfuerzo competitivo</strong>. La categoría no creció (efecto mercado = 0), pero MDLZ ganó 2 pp de participación frente a la competencia. Este es un caso de ganancia pura de share.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="case-card">
+                <div class="case-header" onclick="toggleCase(this)">
+                    <div class="case-title-group">
+                        <div class="case-number">3</div>
+                        <div class="case-title">Mercado cae, MDLZ gana share (defensa)</div>
+                    </div>
+                    <div class="case-badges">
+                        <span class="badge market-down">Mercado ↓</span>
+                        <span class="badge share-up">Share ↑</span>
+                    </div>
+                    <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="case-content">
+                    <div class="case-data">
+                        <div class="data-item">
+                            <div class="data-label">T₀ (Cat. Base)</div>
+                            <div class="data-value neutral">100,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Tₜ (Cat. Actual)</div>
+                            <div class="data-value negative">80,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">M₀ (MDLZ Base)</div>
+                            <div class="data-value neutral">20,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Mₜ (MDLZ Actual)</div>
+                            <div class="data-value neutral">20,000 Kg</div>
+                        </div>
+                    </div>
+                    <div class="case-calculations">
+                        <h5>Cálculos detallados</h5>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">s₀ = M₀/T₀</span>
+                            <span class="case-calc-formula">20,000/100,000 = 0.20 (20%)</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">sₜ = Mₜ/Tₜ</span>
+                            <span class="case-calc-formula">20,000/80,000 = 0.25 (25%)</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">ΔKg MDLZ</span>
+                            <span class="case-calc-formula">20,000 − 20,000 = 0 Kg</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">Efecto Mercado</span>
+                            <span class="case-calc-formula">0.20 × (80,000 − 100,000) = −4,000 Kg</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">Efecto Share</span>
+                            <span class="case-calc-formula">80,000 × (0.25 − 0.20) = +4,000 Kg</span>
+                        </div>
+                    </div>
+                    <div class="case-interpretation">
+                        <div class="case-interpretation-title">Interpretación</div>
+                        <p><strong>Caso clave para la metodología:</strong> MDLZ mantuvo su volumen (ΔKg = 0), lo cual podría parecer neutro. Sin embargo, la descomposición revela que MDLZ compensó una caída del mercado de −4,000 Kg con un esfuerzo competitivo de +4,000 Kg. Esto representa una <strong>excelente defensa de posición</strong>, ganando 5 pp de share en un mercado adverso.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="case-card">
+                <div class="case-header" onclick="toggleCase(this)">
+                    <div class="case-title-group">
+                        <div class="case-number">4</div>
+                        <div class="case-title">Mercado crece, MDLZ pierde share</div>
+                    </div>
+                    <div class="case-badges">
+                        <span class="badge market-up">Mercado ↑</span>
+                        <span class="badge share-down">Share ↓</span>
+                    </div>
+                    <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="case-content">
+                    <div class="case-data">
+                        <div class="data-item">
+                            <div class="data-label">T₀ (Cat. Base)</div>
+                            <div class="data-value neutral">100,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Tₜ (Cat. Actual)</div>
+                            <div class="data-value positive">120,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">M₀ (MDLZ Base)</div>
+                            <div class="data-value neutral">20,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Mₜ (MDLZ Actual)</div>
+                            <div class="data-value neutral">21,600 Kg</div>
+                        </div>
+                    </div>
+                    <div class="case-calculations">
+                        <h5>Cálculos detallados</h5>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">s₀ = M₀/T₀</span>
+                            <span class="case-calc-formula">20,000/100,000 = 0.20 (20%)</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">sₜ = Mₜ/Tₜ</span>
+                            <span class="case-calc-formula">21,600/120,000 = 0.18 (18%)</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">ΔKg MDLZ</span>
+                            <span class="case-calc-formula">21,600 − 20,000 = +1,600 Kg</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">Efecto Mercado</span>
+                            <span class="case-calc-formula">0.20 × (120,000 − 100,000) = +4,000 Kg</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">Efecto Share</span>
+                            <span class="case-calc-formula">120,000 × (0.18 − 0.20) = −2,400 Kg</span>
+                        </div>
+                    </div>
+                    <div class="case-interpretation">
+                        <div class="case-interpretation-title">Interpretación</div>
+                        <p><strong>Señal de alerta:</strong> MDLZ creció en volumen (+1,600 Kg), lo cual podría parecer positivo. Sin embargo, la descomposición muestra que el mercado le aportaba +4,000 Kg, pero MDLZ perdió −2,400 Kg por competitividad (−2 pp de share). El crecimiento observado es <strong>menor al que correspondería</strong> si MDLZ hubiera mantenido su participación.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="case-card">
+                <div class="case-header" onclick="toggleCase(this)">
+                    <div class="case-title-group">
+                        <div class="case-number">5</div>
+                        <div class="case-title">Mercado cae, MDLZ pierde share</div>
+                    </div>
+                    <div class="case-badges">
+                        <span class="badge market-down">Mercado ↓</span>
+                        <span class="badge share-down">Share ↓</span>
+                    </div>
+                    <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6"/>
+                    </svg>
+                </div>
+                <div class="case-content">
+                    <div class="case-data">
+                        <div class="data-item">
+                            <div class="data-label">T₀ (Cat. Base)</div>
+                            <div class="data-value neutral">100,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Tₜ (Cat. Actual)</div>
+                            <div class="data-value negative">80,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">M₀ (MDLZ Base)</div>
+                            <div class="data-value neutral">20,000 Kg</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">Mₜ (MDLZ Actual)</div>
+                            <div class="data-value negative">12,000 Kg</div>
+                        </div>
+                    </div>
+                    <div class="case-calculations">
+                        <h5>Cálculos detallados</h5>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">s₀ = M₀/T₀</span>
+                            <span class="case-calc-formula">20,000/100,000 = 0.20 (20%)</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">sₜ = Mₜ/Tₜ</span>
+                            <span class="case-calc-formula">12,000/80,000 = 0.15 (15%)</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">ΔKg MDLZ</span>
+                            <span class="case-calc-formula">12,000 − 20,000 = −8,000 Kg</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">Efecto Mercado</span>
+                            <span class="case-calc-formula">0.20 × (80,000 − 100,000) = −4,000 Kg</span>
+                        </div>
+                        <div class="case-calc-item">
+                            <span class="case-calc-label">Efecto Share</span>
+                            <span class="case-calc-formula">80,000 × (0.15 − 0.20) = −4,000 Kg</span>
+                        </div>
+                    </div>
+                    <div class="case-interpretation">
+                        <div class="case-interpretation-title">Interpretación</div>
+                        <p><strong>Escenario de doble impacto negativo:</strong> MDLZ perdió −8,000 Kg en total. La descomposición muestra que la mitad (−4,000 Kg) se debe a la contracción de la categoría, y la otra mitad (−4,000 Kg) se debe a pérdida de participación (−5 pp). Este escenario requiere análisis de las causas de la pérdida de competitividad.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="evaluacion" class="full-width-section" style="background: var(--gray-50);">
+        <div class="section-header">
+            <div class="section-label">07. Criterios de Decisión</div>
+            <h2 class="section-title">Matriz de Interpretación</h2>
+            <p class="section-subtitle">Guía para la lectura de resultados según la combinación de efectos.</p>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="evaluation-table">
+                <div class="eval-header">
+                    <div class="eval-header-cell">Condición</div>
+                    <div class="eval-header-cell">Interpretación</div>
+                </div>
+                <div class="eval-row">
+                    <div class="eval-cell condition-cell">
+                        <span class="condition-indicator double-positive"></span>
+                        Efecto Share > 0 y Efecto Mercado > 0
+                    </div>
+                    <div class="eval-cell interpretation-cell">
+                        <strong>Doble impulso positivo.</strong> MDLZ se beneficia del crecimiento de la categoría y además gana participación de mercado. Es el escenario más favorable, donde se combina un mercado en expansión con una ejecución competitiva exitosa.
+                    </div>
+                </div>
+                <div class="eval-row">
+                    <div class="eval-cell condition-cell">
+                        <span class="condition-indicator defense"></span>
+                        Efecto Share > 0 y Efecto Mercado < 0
+                    </div>
+                    <div class="eval-cell interpretation-cell">
+                        <strong>Defensa exitosa.</strong> La categoría se contrae pero MDLZ gana participación. Indica que MDLZ está captando volumen de la competencia en un mercado adverso. El desempeño competitivo es positivo a pesar del contexto difícil.
+                    </div>
+                </div>
+                <div class="eval-row">
+                    <div class="eval-cell condition-cell">
+                        <span class="condition-indicator borrowed"></span>
+                        Efecto Share < 0 y Efecto Mercado > 0
+                    </div>
+                    <div class="eval-cell interpretation-cell">
+                        <strong>Crecimiento dependiente del mercado.</strong> La categoría crece pero MDLZ pierde participación. El crecimiento en volumen absoluto es impulsado por el mercado, no por competitividad. Existe riesgo de perder relevancia si el mercado deja de crecer.
+                    </div>
+                </div>
+                <div class="eval-row">
+                    <div class="eval-cell condition-cell">
+                        <span class="condition-indicator double-negative"></span>
+                        Efecto Share < 0 y Efecto Mercado < 0
+                    </div>
+                    <div class="eval-cell interpretation-cell">
+                        <strong>Doble impacto negativo.</strong> Tanto el mercado como la competitividad afectan negativamente. La categoría se contrae y MDLZ además pierde participación. Requiere análisis de las causas y posibles acciones correctivas.
+                    </div>
+                </div>
+                <div class="eval-row">
+                    <div class="eval-cell condition-cell">
+                        <span class="condition-indicator neutral"></span>
+                        Efecto Share ≈ 0
+                    </div>
+                    <div class="eval-cell interpretation-cell">
+                        <strong>Acompañamiento del mercado.</strong> El volumen de MDLZ está explicado casi totalmente por el tamaño de la categoría. MDLZ mantiene su participación constante: no gana ni pierde relevancia competitiva.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="fundamento">
+        <div class="section-header">
+            <div class="section-label">08. Fundamento Teórico</div>
+            <h2 class="section-title">Respaldo Metodológico</h2>
+            <p class="section-subtitle">Esta descomposición tiene décadas de uso en análisis económico y comercial.</p>
+        </div>
+
+        <div class="foundation-card">
+            <h3><span>📚</span> Constant Market Share Analysis (CMSA)</h3>
+            <p>En comercio internacional, el CMSA se utiliza para descomponer el cambio en exportaciones de un país en <strong>efecto demanda mundial</strong> (crecimiento del mercado) y <strong>efecto competitividad</strong> (cambio en cuota de mercado).</p>
+            <p>Matemáticamente es la misma descomposición que aplicamos aquí, pero en el contexto de marca vs. categoría en lugar de país vs. mundo.</p>
+            <ul class="reference-list">
+                <li><strong>Bonanno (2016)</strong> — "Constant Market Share Analysis: A Note" — Metodología para separar efectos de mercado vs. competitividad</li>
+                <li><strong>OCDE</strong> — "A Constant Market Share Analysis of Spanish Goods Exports" — Aplicación oficial de CMSA</li>
+            </ul>
+        </div>
+
+        <div class="foundation-card">
+            <h3><span>🏙️</span> Shift-Share Analysis</h3>
+            <p>En economía regional, el shift-share es estándar para explicar el crecimiento de empleo o producción en una región, separando:</p>
+            <p>• <strong>National growth effect</strong> (crecimiento general)<br>
+               • <strong>Industry mix effect</strong> (composición sectorial)<br>
+               • <strong>Regional share / competitive effect</strong> (ventaja competitiva local)</p>
+            <ul class="reference-list">
+                <li><strong>Artige &amp; van Neuss (2014)</strong> — "A New Shift-Share Method" — Growth and Change Journal</li>
+            </ul>
+        </div>
+
+        <div class="foundation-card">
+            <h3><span>🛒</span> Volume Decomposition en CPG</h3>
+            <p>En consumer goods, NielsenIQ, IRI y otros proveedores realizan descomposición del volumen de ventas en efectos de tamaño de mercado, precio, promoción, mix y share/competitividad.</p>
+            <p>Conceptualmente es la misma lógica: separar qué parte del cambio proviene del entorno y qué parte de la ejecución competitiva de la marca.</p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">MDLZ Analytics</div>
+            <p class="footer-text">Descomposición de volumen basada en Constant Market Share Analysis.<br>Metodología respaldada por OCDE, literatura de comercio internacional y shift-share analysis.</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleCase(header) {
+            const card = header.parentElement;
+            const wasActive = card.classList.contains('active');
+            
+            document.querySelectorAll('.case-card').forEach(c => {
+                c.classList.remove('active');
+            });
+            
+            if (!wasActive) {
+                card.classList.add('active');
+            }
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
